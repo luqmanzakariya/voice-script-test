@@ -44,12 +44,12 @@ export class User {
   @Column({
     nullable: true,
   })
-  ratePerMinute!: number;
+  ratePerMinute?: number;
 
   @Column({
     nullable: true,
   })
-  flatFee!: number;
+  flatFee?: number;
 
   @CreateDateColumn()
   createdAt!: Date;

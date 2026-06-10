@@ -10,6 +10,7 @@ import { UserRole } from '../users/entities/user.entity';
 import { AssignJobDto } from './dto/assign-job.dto';
 import { JobResponseDto } from './dto/job-response.dto';
 import { UsersService } from '../users/users.service';
+import { PaymentService } from '../payment/payment.service';
 
 @Injectable()
 export class JobsService {
@@ -17,6 +18,7 @@ export class JobsService {
     @InjectRepository(Job)
     private jobsRepository: Repository<Job>,
     private usersService: UsersService,
+    private paymentService: PaymentService,
   ) {}
 
   private toDto(job: Job): JobResponseDto {
@@ -120,17 +122,31 @@ export class JobsService {
         }
       }
 
-      if (
-        updateJobDto.status === JobStatus.TRANSCRIBED ||
-        updateJobDto.status === JobStatus.REVIEWED
-      ) {
+      if (updateJobDto.status === JobStatus.ASSIGNED) {
         if (job.editor) {
           await this.usersService.setAvailable(job.editor.id, true);
           job.editor = null;
         }
+      }
+
+      if (updateJobDto.status === JobStatus.TRANSCRIBED) {
         if (job.reporter) {
           await this.usersService.setAvailable(job.reporter.id, true);
-          job.reporter = null;
+          job.editor = null;
+        }
+      }
+
+      if (updateJobDto.status === JobStatus.REVIEWED) {
+        if (job.editor) {
+          await this.usersService.setAvailable(job.editor.id, false);
+        }
+      }
+
+      if (updateJobDto.status === JobStatus.COMPLETED) {
+        await this.paymentService.generatePaymentsForUser(job);
+
+        if (job.editor) {
+          await this.usersService.setAvailable(job.editor.id, true);
         }
       }
     } else if (userRole === UserRole.REPORTER) {

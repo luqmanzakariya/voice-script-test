@@ -6,6 +6,10 @@ import {
   patchUpdateJobStatusClient,
   getUserReporterAndEditorClient,
 } from "@/service/client/jobs";
+import { postLogoutClient } from "@/service/client/auth";
+import Link from "next/link";
+import APP_ROUTE from "@/lib/app-route";
+import { usePathname, useRouter } from "next/navigation";
 
 type JobStatus = "NEW" | "ASSIGNED" | "TRANSCRIBED" | "REVIEWED" | "COMPLETED";
 
@@ -61,6 +65,8 @@ export default function DashboardPage({
   reporters = [],
   editors = [],
 }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [jobs, setJobs] = useState<Job[]>(initialJobs || []);
   const [reporterList, setReporterList] = useState<User[]>(reporters);
   const [editorList, setEditorList] = useState<User[]>(editors);
@@ -98,11 +104,32 @@ export default function DashboardPage({
     setEditorList(userRes?.data?.editors);
   }
 
+  async function handleLogout() {
+    await postLogoutClient();
+    router.replace(APP_ROUTE.HOME);
+  }
+
   return (
     <div className="flex flex-col flex-1 bg-zinc-50 dark:bg-black px-6 py-8 font-sans">
-      <h1 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-6">
-        Available Jobs
-      </h1>
+      <div className="flex items-center gap-4">
+        <Link href={APP_ROUTE.DASHBOARD} className="mb-8">
+          <h1
+            className={`text-xl font-bold mb-6 ${pathname === "/dashboard" ? "text-blue-800" : "text-black"}`}
+          >
+            Available Jobs
+          </h1>
+        </Link>
+        <Link href={APP_ROUTE.PAYMENT} className="mb-8">
+          <h1
+            className={`text-xl font-bold mb-6 ${pathname === "/payment" ? "text-blue-800" : "text-black"}`}
+          >
+            Payment
+          </h1>
+        </Link>
+        <div className="mb-8 cursor-pointer" onClick={handleLogout}>
+          <h1 className={`text-xl font-bold mb-6 `}>Logout</h1>
+        </div>
+      </div>
 
       <div className="overflow-x-auto rounded-2xl shadow ring-1 ring-zinc-200 dark:ring-zinc-700">
         <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900 text-sm">

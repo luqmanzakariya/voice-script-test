@@ -12,3 +12,12 @@ export const postLoginClient = async (payload: {
     return Promise.reject(error);
   }
 };
+
+export const postLogoutClient = async () => {
+  try {
+    await apiClient.get(API_CLIENT_ROUTE.LOGOUT);
+    return;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};

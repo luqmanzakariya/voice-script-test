@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsNumber, Min, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  Min,
+  IsEnum,
+  ValidateIf,
+} from 'class-validator';
 import { UserRole } from '../../users/entities/user.entity';
 
 export class RegisterDto {
@@ -18,13 +25,15 @@ export class RegisterDto {
   @IsNotEmpty()
   city!: string;
 
+  @ValidateIf((o) => o.role === UserRole.REPORTER)
   @IsNumber()
   @Min(0)
-  ratePerMinute!: number;
+  ratePerMinute?: number;
 
+  @ValidateIf((o) => o.role === UserRole.EDITOR)
   @IsNumber()
   @Min(0)
-  flatFee!: number;
+  flatFee?: number;
 
   @IsEnum(UserRole)
   @IsNotEmpty()

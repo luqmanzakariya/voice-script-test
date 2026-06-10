@@ -7,6 +7,8 @@ export const API_ROUTE = {
   USERS_EDITORS: "/users/by-role?role=EDITOR",
   JOBS_ASSIGN: "/jobs/assign",
   JOBS_UPDATE: "/jobs/update",
+  PAYMENT: "/payments",
+  PAYMENT_BY_USER: "/payments/user",
 };
 
 export default API_ROUTE;
